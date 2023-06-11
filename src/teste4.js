@@ -13,7 +13,7 @@ module.exports = function (req, res) {
   const user = data.find((user) => user.id === id);
 
   if (!user) {
-    res.status(404).send('User not found');
+    res.status(404).send('Usuario não encontrado');
     return;
   }
 

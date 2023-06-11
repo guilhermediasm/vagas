@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-
-const dataPath = path.join(__dirname, 'fakeData.json');
+const fakeDataPath = path.join(__dirname, 'fakeData.js');
 
 module.exports = function (req, res) {
   const name = req.body.name;
@@ -12,30 +11,16 @@ module.exports = function (req, res) {
     job: job,
   };
 
-  // Lê o conteúdo atual do arquivo fakeData.json
-  fs.readFile(dataPath, 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Internal Server Error');
-      return;
-    }
+  // Carrega o módulo do arquivo fakeData.js
+  let users = require('./fakeData');
 
-    // Faz o parse do conteúdo do arquivo para um objeto JSON
-    const users = JSON.parse(data);
+  // Adiciona o novo usuário ao array existente
+  users.push(newUser);
 
-    // Adiciona o novo usuário ao array existente
-    users.push(newUser);
+  // Escreve o conteúdo atualizado de volta no arquivo fakeData.js
+  const dataAsString = `module.exports = ${JSON.stringify(users, null, 2)};\n`;
+  fs.writeFileSync(fakeDataPath, dataAsString, 'utf8');
 
-    // Escreve o conteúdo atualizado no arquivo fakeData.json
-    fs.writeFile(dataPath, JSON.stringify(users), 'utf8', (err) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Internal Server Error');
-        return;
-      }
-
-      // Retorna o novo usuário como resposta
-      res.send(newUser);
-    });
-  });
+  // Retorna o novo usuário como resposta
+  res.send(newUser);
 };

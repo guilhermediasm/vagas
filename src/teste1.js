@@ -6,6 +6,7 @@ const getUser = (req, res, next) => {
   const user = data.find((item) => item.name === name);
 
   if (user) {
+    user.count = user.count ? user.count + 1 : 1;
     res.send(user);
   } else {
     res.status(404).send("User not found");

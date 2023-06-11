@@ -1,46 +1,31 @@
 const fs = require('fs');
 const path = require('path');
-
-const dataPath = path.join(__dirname, 'fakeData.json');
+const fakeDataPath = path.join(__dirname, 'fakeData.js');
 
 module.exports = function (req, res) {
   const id = req.query.id;
   const { name, job } = req.body;
 
-  // Lê o conteúdo atual do arquivo fakeData.json
-  fs.readFile(dataPath, 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Internal Server Error');
-      return;
-    }
+  // Carrega o módulo do arquivo fakeData.js
+  let data = require('./fakeData');
 
-    // Faz o parse do conteúdo do arquivo para um objeto JSON
-    const users = JSON.parse(data);
+  // Encontra o usuário pelo ID
+  const user = data.find((user) => user.id === id);
 
-    // Encontra o índice do usuário no array
-    const userIndex = users.findIndex((user) => user.id == id);
+  if (!user) {
+    res.status(404).send('User not found');
+    return;
+  }
 
-    if (userIndex === -1) {
-      res.status(404).send('User not found');
-      return;
-    }
+  // Atualiza os dados do usuário
+  updateUserData(user, name, job);
 
-    // Atualiza os dados do usuário
-    updateUserData(users[userIndex], name, job);
+  // Escreve o conteúdo atualizado de volta no arquivo fakeData.js
+  const dataAsString = `module.exports = ${JSON.stringify(data, null, 2)};\n`;
+  fs.writeFileSync(fakeDataPath, dataAsString, 'utf8');
 
-    // Escreve o conteúdo atualizado no arquivo fakeData.json
-    fs.writeFile(dataPath, JSON.stringify(users), 'utf8', (err) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Internal Server Error');
-        return;
-      }
-
-      // Retorna os dados atualizados do usuário como resposta
-      res.send(users[userIndex]);
-    });
-  });
+  // Retorna os dados atualizados do usuário como resposta
+  res.send(user);
 };
 
 function updateUserData(user, name, job) {

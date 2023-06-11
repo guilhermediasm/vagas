@@ -11,7 +11,6 @@ function getUserReadCount(username) {
 module.exports = function (req, res) {
   const username = req.query.username;
 
-  // Obtém a quantidade de leituras do usuário
   const readCount = getUserReadCount(username);
   if (readCount === -1) {
     res.status(404).send(`Usuario ${username} não encontrado`);

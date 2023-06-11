@@ -12,7 +12,6 @@ module.exports = function (req, res) {
       count: 0,
     };
 
-    // Carrega o módulo do arquivo fakeData.js
     let users = require("./fakeData");
 
     const userIndex = users.findIndex((user) => user.name === name);
@@ -21,8 +20,6 @@ module.exports = function (req, res) {
     if (userIndex === -1) {
       users.push({ id: users.length + 1, ...newUser });
 
-      // Escreve o conteúdo atualizado de volta no arquivo fakeData.js
-
       const dataAsString = `module.exports = ${JSON.stringify(
         users,
         null,
@@ -30,7 +27,6 @@ module.exports = function (req, res) {
       )};\n`;
       fs.writeFileSync(fakeDataPath, dataAsString, "utf8");
 
-      // Retorna o novo usuário como resposta
       delete newUser.count;
       res.send(newUser);
     } else {

@@ -6,10 +6,8 @@ module.exports = function (req, res) {
   const id = req.query.id;
   const { name, job } = req.body;
 
-  // Carrega o módulo do arquivo fakeData.js
   let data = require('./fakeData');
 
-  // Encontra o usuário pelo ID
   const user = data.find((user) => user.id === id);
 
   if (!user) {
@@ -17,14 +15,11 @@ module.exports = function (req, res) {
     return;
   }
 
-  // Atualiza os dados do usuário
   updateUserData(user, name, job);
 
-  // Escreve o conteúdo atualizado de volta no arquivo fakeData.js
   const dataAsString = `module.exports = ${JSON.stringify(data, null, 2)};\n`;
   fs.writeFileSync(fakeDataPath, dataAsString, 'utf8');
 
-  // Retorna os dados atualizados do usuário como resposta
   res.send(user);
 };
 
